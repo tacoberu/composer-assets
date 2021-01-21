@@ -37,7 +37,9 @@ Add list of files definition (vendor-src -> public-desc) in scripts/assets.json:
 {
 	"nette/forms/src/assets/netteForms.js": "assets/js/netteForms.js",
 	"nette/forms/examples/assets/logo.png": "assets/img/logo.png",
-	"nette/forms/examples/assets/style.css": "assets/style.css"
+	"../app/examples/assets/style-1.css": "assets/style.css",
+	"../app/examples/assets/style-2.css": "assets/style.css",
+	"../app/examples/assets/style-3.css": "assets/style.css"
 }
 ```
 

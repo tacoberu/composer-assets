@@ -22,10 +22,26 @@ class CopyAssetsToPublic
 		$vendorDir = $ev->getComposer()->getConfig()->get('vendor-dir');
 		$wwwDir = self::requireWwwDir($ev->getComposer()->getConfig()->get('www-dir'));
 		$definitionFile = self::requireLocation($ev->getComposer()->getConfig()->get('assets-definition'));
+
+		// seskupení
+		$tree = [];
 		foreach (json_decode(file_get_contents($definitionFile)) as $src => $desc) {
-			$ev->getIO()->write("\tcopy-to: '$desc'");
-			copy($vendorDir . '/' . $src, self::requireDir($wwwDir, dirname($desc)) . '/' . basename($desc));
+			if ( ! array_key_exists($desc, $tree)) {
+				$tree[$desc] = [];
+			}
+			$tree[$desc][] = $src;
 		}
+
+		// zápis podle skupin
+		foreach ($tree as $desc => $items) {
+			$ev->getIO()->write("\tcopy-to: '$desc'");
+			$content = [];
+			foreach ($items as $x) {
+				$content[] = file_get_contents($vendorDir . '/' . $x);
+			}
+			file_put_contents(self::requireDir($wwwDir, dirname($desc)) . '/' . basename($desc), implode("\n\n\n", $content));
+		}
+
 		$ev->getIO()->write("\tdone");
 	}
 
