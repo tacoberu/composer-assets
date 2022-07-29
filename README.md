@@ -35,11 +35,17 @@ Usage
 Add list of files definition (vendor-src -> public-desc) in scripts/assets.json:
 ```json
 {
-	"nette/forms/src/assets/netteForms.js": "assets/js/netteForms.js",
-	"nette/forms/examples/assets/logo.png": "assets/img/logo.png",
-	"../app/examples/assets/style-1.css": "assets/style.css",
-	"../app/examples/assets/style-2.css": "assets/style.css",
-	"../app/examples/assets/style-3.css": "assets/style.css"
+	"www:/assets/js/netteForms.js": [
+		"vendor:/nette/forms/src/assets/netteForms.js"
+	],
+	"www:/assets/img/logo.png": [
+		"vendor:/nette/forms/examples/assets/logo.png"
+	],
+	"www:/assets/style.css": [
+		"../app/examples/assets/style-1.css",
+		"../app/examples/assets/style-2.css",
+		"../app/examples/assets/style-3.css"
+	]
 }
 ```
 

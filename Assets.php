@@ -24,25 +24,51 @@ class CopyAssetsToPublic
 		$definitionFile = self::requireLocation($ev->getComposer()->getConfig()->get('assets-definition'));
 
 		// seskupení
-		$tree = [];
-		foreach (json_decode(file_get_contents($definitionFile)) as $src => $desc) {
-			if ( ! array_key_exists($desc, $tree)) {
-				$tree[$desc] = [];
-			}
-			$tree[$desc][] = $src;
-		}
+		$tree = json_decode(file_get_contents($definitionFile));
 
 		// zápis podle skupin
 		foreach ($tree as $desc => $items) {
+			self::assertStartWithWWW($desc);
 			$ev->getIO()->write("\tcopy-to: '$desc'");
 			$content = [];
 			foreach ($items as $x) {
-				$content[] = file_get_contents($vendorDir . '/' . $x);
+				$content[] = file_get_contents(self::resolvePath($x, $definitionFile, $vendorDir, $wwwDir));
 			}
+			$desc = ltrim(substr($desc, 4), '/');
 			file_put_contents(self::requireDir($wwwDir, dirname($desc)) . '/' . basename($desc), implode("\n\n\n", $content));
 		}
 
 		$ev->getIO()->write("\tdone");
+	}
+
+
+
+	private static function assertStartWithWWW($path)
+	{
+		if (strncmp($path, 'www:', 4) !== 0) {
+			throw new LogicException("Destination path '$path' must start 'www:' prefix.");
+		}
+	}
+
+
+
+	private static function resolvePath($x, $definitionFile, $vendorDir, $wwwDir)
+	{
+		switch (True) {
+			case strncmp($x, 'vendor:', 7) === 0:
+				return self::buildPath($vendorDir, substr($x, 7));
+			case strncmp($x, 'www:', 4) === 0:
+				return self::buildPath($wwwDir, substr($x, 4));
+			default:
+				return self::buildPath(dirname($definitionFile), $x);
+		}
+	}
+
+
+
+	private static function buildPath($prefix, $path)
+	{
+		return $prefix . '/' . ltrim($path, '/');
 	}
 
 
